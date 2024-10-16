@@ -111,8 +111,8 @@ function launch_cursor() {
         cursor_appimage=$(find_cursor_appimage)
     fi
 
-    # Launch Cursor
-    exec "$cursor_appimage" "$@"
+    # Launch Cursor in the background with no logs
+    nohup "$cursor_appimage" "$@" >/dev/null 2>&1 &
 }
 
 # Parse command-line arguments
