@@ -30,6 +30,26 @@ The installation script will:
 2. Make the script executable
 3. Download and install the latest version of Cursor
 
+## Uninstalling
+
+To uninstall the Cursor Linux Installer, you can run the uninstall script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/watzon/cursor-linux-installer/main/uninstall.sh | bash
+```
+
+or
+
+```bash
+wget -qO- https://raw.githubusercontent.com/watzon/cursor-linux-installer/main/uninstall.sh | bash
+```
+
+The uninstall script will:
+
+1. Remove the `cursor` script from `~/.local/bin/`
+2. Remove the Cursor AppImage
+3. Ask if you want to remove the Cursor configuration files
+
 ## Usage
 
 After installation, you can use the `cursor` command to launch Cursor or update it:
