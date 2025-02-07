@@ -76,7 +76,7 @@ function install_cursor() {
     cp squashfs-root/cursor.desktop "$apps_dir/"
 
     # Update desktop file to point to the correct AppImage location
-    sed -i "s|Exec=.*|Exec=$install_dir/cursor.appimage|g" "$apps_dir/cursor.desktop"
+    sed -i "s|Exec=.*|Exec=$install_dir/cursor.appimage --no-sandbox|g" "$apps_dir/cursor.desktop"
 
     # Clean up
     cd "$current_dir"
