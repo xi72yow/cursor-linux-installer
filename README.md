@@ -35,13 +35,14 @@ The installation script will:
 To uninstall the Cursor Linux Installer, you can run the uninstall script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/watzon/cursor-linux-installer/main/uninstall.sh | bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/watzon/cursor-linux-installer/main/uninstall.sh)"
 ```
 
 or
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/watzon/cursor-linux-installer/main/uninstall.sh | bash
+bash -c "$(wget -qO- https://raw.githubusercontent.com/watzon/cursor-linux-installer/main/uninstall.sh)"
+
 ```
 
 The uninstall script will:
