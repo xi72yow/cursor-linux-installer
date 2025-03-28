@@ -40,13 +40,66 @@ function get_install_dir() {
     exit 1
 }
 
+function get_fallback_download_info() {
+    local arch=$(get_arch)
+
+    # this AppImage is potentially older than expected, see
+    # https://github.com/watzon/cursor-linux-installer/issues/5
+    echo "MESSAGE=$1"
+    echo "URL=https://downloader.cursor.sh/linux/appImage/$arch"
+    echo "VERSION=fallback"
+    return 1
+}
+
+function get_download_info() {
+    if ! which jq >/dev/null 2>&1; then
+        get_fallback_download_info "jq not available"
+        return 1
+    fi
+
+    local temp_file=$(mktemp)
+    local api_url="https://www.cursor.com/api/download?platform=linux-$(get_arch)&releaseTrack=stable"
+    if ! curl -s "$api_url" -o "$temp_file"; then
+        rm -f "$temp_file"
+        get_fallback_download_info "curl failed on $api_url"
+        return 1
+    fi
+
+    if ! download_url=$(jq -er '.downloadUrl' "$temp_file"); then
+        rm -f "$temp_file"
+        get_fallback_download_info "jq failed: downloadUrl not found in JSON response"
+        return 1
+    fi
+
+    if ! version=$(jq -er '.version' "$temp_file"); then
+        rm -f "$temp_file"
+        get_fallback_download_info "jq failed: version not found in JSON response"
+        return 1
+    fi
+
+    rm -f "$temp_file"
+
+    echo "URL=$download_url"
+    echo "VERSION=$version"
+    return 0
+}
+
 function install_cursor() {
-    local download_url="$1"
-    local install_dir="$2"
+    local install_dir="$1"
     local temp_file=$(mktemp)
     local current_dir=$(pwd)
+    local download_info=$(get_download_info)
+    local message=$(echo "$download_info" | grep "MESSAGE=" | sed 's/^MESSAGE=//')
 
-    echo "Downloading latest Cursor AppImage..."
+    if [ -n "$message" ]; then
+        echo "$message"
+        return 1
+    fi
+
+    local download_url=$(echo "$download_info" | grep "URL=" | sed 's/^URL=//')
+    local version=$(echo "$download_info" | grep "VERSION=" | sed 's/^VERSION=//')
+
+    echo "Downloading $version Cursor AppImage..."
     if ! curl -L "$download_url" -o "$temp_file"; then
         echo "Failed to download Cursor AppImage" >&2
         rm -f "$temp_file"
@@ -89,7 +142,6 @@ function install_cursor() {
 function update_cursor() {
     echo "Updating Cursor..."
     local arch=$(get_arch)
-    local download_url="https://downloader.cursor.sh/linux/appImage/$arch"
     local current_appimage=$(find_cursor_appimage)
     local install_dir
 
@@ -99,7 +151,7 @@ function update_cursor() {
         install_dir=$(get_install_dir)
     fi
 
-    install_cursor "$download_url" "$install_dir"
+    install_cursor "$install_dir"
 }
 
 function launch_cursor() {
