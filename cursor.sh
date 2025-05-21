@@ -15,8 +15,8 @@ function check_fuse() {
     if command -v apt-get &>/dev/null; then
         if ! dpkg -l | grep -q "^ii.*fuse "; then
             echo "Installing FUSE..."
-            $cmd_prefix apt-get update
-            $cmd_prefix apt-get install -y fuse
+            $cmd_prefix apt update
+            $cmd_prefix apt install -y fuse libfuse2t64
         else
             echo "FUSE is already installed."
         fi
